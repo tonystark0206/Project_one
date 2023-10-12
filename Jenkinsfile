@@ -1,17 +1,26 @@
 pipeline {
     agent any
+
     stages {
+        stage('Checkout Code') {
+            steps {
+                // Check out the source code from your GitHub repository
+                checkout scm
+            }
+        }
         stage('Build Docker Image') {
             steps {
+                // Build the Docker image
                 script {
-                    def dockerImage = docker.build("my-docker-image:latest", ".")
+                    def customImage = docker.build("my-node-app:${env.BUILD_ID}")
                 }
             }
         }
         stage('Run Docker Container') {
             steps {
+                // Run the Docker container
                 script {
-                    def containerId = dockerImage.run('-p 8080:80 -d')
+                    customImage.run("-p 8080:8080 -d")
                 }
             }
         }
