@@ -2,27 +2,35 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code') {
+        stage('Checkout') {
             steps {
-                // Check out the source code from your GitHub repository
+                // Checkout the source code from your GitHub repository
                 checkout scm
             }
         }
+
         stage('Build Docker Image') {
             steps {
-                // Build the Docker image
                 script {
-                    def customImage = docker.build("my-node-app:${env.BUILD_ID}")
+                    // Define the Docker image name and tag
+                    def dockerImage = docker.build('my-node-app:latest', '.')
                 }
             }
         }
-        stage('Run Docker Container') {
+
+        stage('Run Docker Container Locally') {
             steps {
-                // Run the Docker container
                 script {
-                    customImage.run("-p 8080:8080 -d")
+                    // Run the Docker container locally
+                    def containerId = dockerImage.run('-p 8080:8080 -d')
                 }
             }
+        }
+    }
+
+    post {
+        success {
+            // Publish an artifact, send notifications, or perform other post-build actions
         }
     }
 }
